@@ -350,7 +350,8 @@ pre {
  * Artwork
  */
 .artwork-img {
-  width: 250px; }
+  margin: 10px;
+  max-height: 190px; }
 
 @media screen and (max-width: 600px) {
   .top-art-row {

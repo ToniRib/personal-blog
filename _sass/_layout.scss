@@ -276,7 +276,8 @@
 }
 
 .col-1-3 {
-  width: 33.3333333%;
+  width: 33.33333%;
+  box-sizing: border-box;
 }
 
 /**
@@ -284,7 +285,7 @@
  */
 
 .artwork-img {
-  margin: 10px;
+  margin: 0 10px;
   max-height: 190px;
 }
 

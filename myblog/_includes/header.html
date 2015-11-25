@@ -20,6 +20,7 @@
           <li class="nav-list-item">
             <a class="page-link" href="/">Home</a>
           </li>
+
           {% for my_page in site.pages %}
             {% if my_page.title %}
             <li class="nav-list-item">
@@ -27,6 +28,18 @@
             </li>
             {% endif %}
           {% endfor %}
+
+          <li class="nav-list-item">
+            <a class="page-link" href="http://tonirib.github.io/ToniRib-Portfolio/dist/">Portfolio</a>
+          </li>
+
+          <li class="nav-list-item">
+            <a class="page-link" href="/photos">Photos</a>
+          </li>
+
+          <li class="nav-list-item">
+            <a class="page-link" href="/artwork">Artwork</a>
+          </li>
         </ul>
       </div>
     </nav>

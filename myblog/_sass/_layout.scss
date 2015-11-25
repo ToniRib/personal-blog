@@ -33,8 +33,9 @@
     }
 
     .page-link {
-        color: $text-color;
+        color: $brand-color-hot;
         line-height: $base-line-height;
+        font-variant: small-caps;
 
         // Gaps between nav items, but not on the last one
         &:not(:last-child) {
@@ -102,6 +103,7 @@
 .nav-list-item {
   display: inline-block;
   margin: 0 1em;
+  font-size: 1.2em;
 }
 
 
@@ -184,7 +186,7 @@
 }
 
 .page-heading {
-    font-size: 20px;
+    font-size: 2em;
 }
 
 .post-list {
@@ -206,6 +208,10 @@
     font-size: 24px;
 }
 
+.post-link-title {
+  margin-bottom: 0;
+}
+
 
 
 /**
@@ -216,9 +222,11 @@
 }
 
 .post-title {
-    font-size: 42px;
+    font-size: 2.5em;
     letter-spacing: -1px;
     line-height: 1;
+    margin-top: 0.5em;
+    color: $brand-color;
 
     @include media-query($on-laptop) {
         font-size: 36px;

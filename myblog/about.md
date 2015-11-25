@@ -4,12 +4,7 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+Toni Rib is a web developer living in Denver, CO who is currently attending the Turing School of Software & Design. She is passionate about bold designs, bright colors, and encouraging others to live their lives to the fullest.
 
-You can find the source code for the Jekyll new theme at:
-{% include icon-github.html username="jglovier" %} /
-[jekyll-new](https://github.com/jglovier/jekyll-new)
-
-You can find the source code for Jekyll at
-{% include icon-github.html username="jekyll" %} /
-[jekyll](https://github.com/jekyll/jekyll)
+_"You have no responsibility to live up to what other people think you ought to accomplish. I have no responsibility to be like they expect me to be: it's their mistake, not my failing."
+- Richard P. Feynman_

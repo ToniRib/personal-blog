@@ -177,12 +177,15 @@ pre {
   @media screen and (max-width: 600px) {
     .site-nav {
       position: absolute;
-      top: 9px;
+      top: -40px;
       right: 15px;
       background-color: #fdfdfd;
       border: 1px solid #9ae6ff;
       border-radius: 5px;
       text-align: right; }
+      .site-nav .nav-list-item {
+        display: block;
+        margin-left: 0; }
       .site-nav .menu-icon {
         display: block;
         float: right;

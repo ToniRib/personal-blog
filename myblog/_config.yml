@@ -10,8 +10,8 @@ title: toni rib
 email: tonimarierib@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   Thoughts from the mind of Toni, served up hot for your reading pleasure.
-baseurl: "/personal-blog/myblog" # the subpath of your site, e.g. /blog
-url: "http://yourdomain.com" # the base hostname & protocol for your site
+baseurl: "/personal-blog" # the subpath of your site, e.g. /blog
+url: "http://tonirib.github.io" # the base hostname & protocol for your site
 twitter_username: tonimarierib
 github_username:  tonirib
 

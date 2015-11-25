@@ -186,8 +186,6 @@ pre {
       .site-nav .nav-list-item {
         display: block;
         margin-left: 0; }
-      .site-nav .top-art-row {
-        margin-top: 2em; }
       .site-nav .menu-icon {
         display: block;
         float: right;
@@ -353,6 +351,10 @@ pre {
  */
 .artwork-img {
   width: 95%; }
+
+@media screen and (max-width: 600px) {
+  .top-art-row {
+    margin-top: 2em; } }
 
 /**
  * Syntax highlighting styles

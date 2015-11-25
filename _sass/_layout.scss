@@ -57,10 +57,6 @@
           margin-left: 0;
         }
 
-        .top-art-row {
-          margin-top: 2em;
-        }
-
         .menu-icon {
             display: block;
             float: right;
@@ -289,4 +285,10 @@
 
 .artwork-img {
   width: 95%;
+}
+
+.top-art-row {
+  @include media-query($on-palm) {
+    margin-top: 2em;
+  }
 }

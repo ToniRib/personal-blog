@@ -4,3 +4,9 @@ title:  "Follow the Errors"
 date:   2015-12-04 10:05:00 -0700
 categories: jekyll update
 ---
+
+This week in module 2 we spent a lot of time creating errors in our code (on purpose) and then "following the errors" to fix them. We learned this technique in module 1 but I didn't realize how useful and important it was until trying it on a very large set of complicated errors, some of which I hadn't seen before. It certainly reinforced the reasons for doing Test Driven Development.
+
+I spent a lot of time this week with new student from the 1511 cohort, mostly trying to get them to practice good TDD and take each error one step at a time. It was really useful that I was currently doing this in my own project because it helped give me a way to convince them that even though their programs were simple and sometimes you could jump a few errors ahead, it really does pay off to practice going just one error at a time.
+
+Test Driven Development has been a new concept for me since starting at Turing and it's the best thing that I've learned so far. I often compare how we solve problems by writing the tests first to how my old program at Raytheon approached testing. Basically the program had a separate test team, who neither knew the requirements for the software or (sometimes) also didn't know how to run the software. The program would wait until all development was "done" to even think about how to test the software. It was never surprising to me how many bugs the software had and how poorly the tests were written and executed. Though it would take a lot for a company like Raytheon to change, I feel like there's no program too big that wouldn't benefit from switching over to TDD.

@@ -1,0 +1,12 @@
+---
+layout: post
+title:  "Behind The Scenes"
+date:   2015-12-14 09:52:00 -0700
+categories: jekyll update
+---
+
+We've been working with Sinatra the last two weeks and now that we've done some reading on Rails I understand why we took the approach we did. There has been some frustration among the class as to why we would spend so much time learning Sinatra if we may not use it again, but I think if we had jumped directly into Rails we wouldn't have much understand of what is going on behind the scenes with our routes.
+
+It reminds me a little of high school math class. At my school, we were always taught the most difficult and long way of solving a problem first, especially in Calculus. Our teacher really wanted us to understand WHY we were doing something and what was happening at every step. After we mastered that, we would be taught the short and easy way of solving the problem. It was always far more practical, but if we had started with that we might not understand what was really happening. Finally, we would be taught how to do it with our calculators, which would basically just spit out the right answer without any knowledge of how it go it. Obviously this was the fastest and easiest way to get to the answer (and what you might do at a real job) but by this time we already had a solid understanding of what was happening.
+
+It's been a long time since I was taught this way and I truly appreciate it. I'm happy to have enrolled in a program where they don't just drop us into Rails immediately. It may teach me how to build an app in Rails, but I would probably have no idea how to translate that knowledge into any other framework.

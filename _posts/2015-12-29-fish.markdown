@@ -1,0 +1,55 @@
+---
+layout: post
+title:  "Switching to Fish"
+date:   2015-12-14 09:52:00 -0700
+categories: jekyll update
+---
+
+I've been wondering for a while how some of the instructors get the cool autocomplete suggestions in their terminal window but have been completely unable to figure it out. I finally learned that it isn't something you can do with bash, but that there's a totally different shell called fish that has this functionality built in! I made the decision to switch over break thinking that it would be as easy as switching from Terminal to iTerm 2.
+
+Turns out that wasn't quite the case.
+
+I learned that fish, while similar to bash, has quite a few differences, especially in how the configuration is done. I was hoping to be able to just copy my bash_profile into a new file, but fish works in an entirely different way. Instead of aliasing common commands, I had to create separate .fish function files and create a function for each of my previous aliases.
+
+For example, my old alias used to look like:
+
+```
+alias gpom="git push origin master"
+```
+
+But in fish I now have a file located at `~/.config/fish/functions/gpom.fish` which contains:
+
+```
+function gpom
+  git push origin master
+end
+```
+
+I also ran into trouble with the prompt. I had a pretty customized prompt with the 'dirty' git status being a main feature of it. It took quite a bit of Googling, but there are people out there who have solved this problem. I ended out using [a solution from Mariusz Smykula](https://github.com/mariuszs/informative_git_prompt/blob/master/__informative_git_prompt.fish) with a few tweaks of my own.
+
+The prompt itself it also strange because it is located in another fish function file called `fish_prompt.fish`. There is no 'PS1' like you would find in bash, just another function called fish_prompt. I ended out setting mine up like this:
+
+```
+function fish_prompt --description 'Write out the prompt'
+
+  set -l last_status $status
+
+  set_color 55f914
+  echo -n (basename $PWD)
+  set_color normal
+
+  echo -n ' '
+  __informative_git_prompt
+
+  if not test $last_status -eq 0
+    set_color $fish_color_error
+  end
+
+  set_color yellow
+  echo -n ' ➾ '
+
+  set_color normal
+end
+```
+
+Now that I have everything set up similar to bash, I'm digging all of the autocomplete and search features I have with fish. It took a while to get it all up and running, but I think it might be worth it!

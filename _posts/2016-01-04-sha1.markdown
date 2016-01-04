@@ -49,4 +49,4 @@ Your SHA-1 Hex Digest for the message 'toni' is:
 532ff71c0f0c138e61afd0c77279be9f5bb6c4f0
 ```
 
-My final GitHub repo is here: https://github.com/ToniRib/SHA-1
+My final GitHub repo is here: [https://github.com/ToniRib/SHA-1](https://github.com/ToniRib/SHA-1)

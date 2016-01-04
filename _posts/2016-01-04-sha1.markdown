@@ -33,7 +33,7 @@ I wanted to be able to check the intermediate steps to my program, basically wha
 
 The main takeaway that I learned from building this algorithm is that it helps to break each individual process and step apart into as small of chunks as possible and only take the current thing you're working on. Taken as a whole, the specification looks intimidating, but by using TDD and going slowly through each part, the entire thing came together easier than I thought it would.
 
-Since I'm not using fish as my shell, I also added a fish function for my SHA-1 digest so that I can use it anywhere in my terminal.
+Since I'm using fish as my shell, I also added a fish function for my SHA-1 digest so that I can use it anywhere in my terminal.
 
 ```
 function sha1_digest

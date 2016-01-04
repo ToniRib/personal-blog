@@ -11,4 +11,40 @@ I started with the preprocessing section and immediately got stuck when I encoun
 
 $$ l + 1 + k \equiv 448mod512 $$
 
-What on earth does that mean? I found that throughout this project I ended up on Google and Stack Overflow researching a lot of the concepts. In this example, \\(l\\) is the length of the original message \\(M\\) in bits and \\(k\\)is the number of zero bits that are going to pad the message. That seems simple enough, so I originally tried to solve for \\(k\\). However, that approach becomes convoluted very quickly, and is difficult to solve for when the original message is longer than 448 bits. With some more searching, I realized that what you actually need to do is determine the minimum number of 512 bit words that can contain the entire message, plus the number one, plus the length encoded as a 64 bit binary message. This made the problem much easier to solve, because instead of figuring out how many zero bits of padding you need, you can simply figure out how many blocks you will need, add the message plus the number one to the beginning, append on zeros until you hit a multiple of 512 bits, and then remove the last 64 zeros and replace them with the length encoded as a 64 bit binary message.
+What on earth does that mean? Throughout this project I ended up on Google and Stack Overflow researching a lot of the concepts, including this one.
+
+In this example, \\(l\\) is the length of the original message \\(M\\) in bits and \\(k\\)is the number of zero bits that are going to pad the message. That seems simple enough, so I originally tried to solve for \\(k\\). However, that approach becomes convoluted very quickly, and is difficult to solve for when the original message is longer than 447 bits. With some more searching, I realized that what you actually need to do is determine the minimum number of 512 bit words that can contain the entire message, plus the number one, plus the length encoded as a 64 bit binary message.
+
+This made the problem much easier to solve, because instead of figuring out how many zero bits of padding you need, you can simply figure out how many blocks you will need, add the message plus the number one to the beginning, append on zeros until you hit a multiple of 512 bits, and then remove the last 64 zeros and replace them with the length encoded as a 64 bit binary message. Finally, you can cut the entire message into blocks of 512 bits, since each block will be treated separately when processing.
+
+With that problem solved, I moved onto the processing section. This section involves a lot more steps, so I broke the problem down into each individual step and wrote at least one method per step. Each step is performed on one 512-bit block at a time, which is also divided into sixteen 32 bit words.
+
+First you create the message schedule by following a specific formula to turn the sixteen 32 bit words into eighty 32 bit words. The first 16 words are just the original 16 words of the message, but past that the new words rely on combinations of previous message schedule words. This is the first section where I had to start looking up computer science concepts such as how to perform a binary left shift and a bitwise exclusive or on four different binary strings. I realized that these operations were going to be used more than once while processing so I create separate methods for them.
+
+Ruby actually comes with some built in operators for performing methods like 'xor' and 'and', but they operate on integers, so I found myself often switching between integers and binary strings. I also had to implement methods to convert from hex to binary or binary to hex since the SHA-1 constants are given in hexadecimal.
+
+After generating the message schedule, you set up the 5 working variables, which change each time you go through the loop (which is 80 times, one for each word). Updating the working variables is where the SHA-1 function is finally used. This function is actually four functions, each of which has its own constant, and each of which is used at a different point in the loop. You then construct the intermediate hash by adding the new working variable values to the previous hash value (which is originally initialized as a constant). Finally, after going through all of the words, and each of the 512-bit blocks (if there were more than one), you concatenate together the five 32-bit hash values to achieve the final message digest. The final message is then converted to hexadecimal and displayed to the user.
+
+The problem that I ran into at the end is that until I have done all of the preprocessing and processing, I wouldn't know until the very end whether or not I had the right answer. Since the SHA-1 hash should be the same every time for the same input string, I could use the Digest::SHA1 class that Ruby comes with to compare my answer with the real answer. As it turns out, I didn't have the correct answer the first time. I actually had two separate bugs that I had to track down.
+
+The first one was hidden in an incorrect copying of one of the constants. I started by rechecking my methods (which I had tests for, but it never hurts to write more tests) and realizing that all of my methods seemed to be performing properly. I wanted to know if I had a copy/paste error, so I rechecked all the hex constants I had copied. Sure enough, in one constant I had typed an 'a' instead of a 'c.' However, fixing that didn't make my hexdigest match what Ruby was spitting out, so I knew I had another bug somewhere.
+
+I wanted to be able to check the intermediate steps to my program, basically what the working variables should be equal to after each step. All my tests were passing, so I suspected that it wasn't a problem with any of my methods, but in an input I was passing to my methods. Basically I had tested that with the correct inputs, I always got the correct outputs, so if I was still getting the wrong output, I must be putting in the wrong input somewhere. I ended out using pry and [this site](http://www.metamorphosite.com/one-way-hash-encryption-sha1-data-software) which shows you, for a given message, what every single intermediate binary string is to help me debug. I quickly tracked the problem to my methods where I generate the temporary working variable anytime after the first iteration. From there, it was easy to see that in my 'process' method I had accidentally passed in a constant instead of the number for the current iteration I was on, causing the answer to be incorrect anytime after the zeroth iteration. With that fixed, everything worked!
+
+The main takeaway that I learned from building this algorithm is that it helps to break each individual process and step apart into as small of chunks as possible and only take the current thing you're working on. Taken as a whole, the specification looks intimidating, but by using TDD and going slowly through each part, the entire thing came together easier than I thought it would.
+
+Since I'm not using fish as my shell, I also added a fish function for my SHA-1 digest so that I can use it anywhere in my terminal.
+
+```
+function sha1_digest
+  ruby ~/turing/personal-projects/sha1/lib/sha1_hexdigest.rb $argv
+end
+```
+
+Now from any directory, I can type the command 'sha1_digest' and get back the corresponding hexdigest for any message.
+
+```
+$ sha1_digest 'toni'
+Your SHA-1 Hex Digest for the message 'toni' is:
+532ff71c0f0c138e61afd0c77279be9f5bb6c4f0
+```

@@ -9,4 +9,4 @@ At the end of my first module at Turing, Jeff challenged me to complete a diffic
 
 I started with the preprocessing section and immediately got stuck when I encountered the line:
 
-$$ a^2 + b^2 = c^2 $$
+$$ l + 1 + k \equiv 448mod512 $$

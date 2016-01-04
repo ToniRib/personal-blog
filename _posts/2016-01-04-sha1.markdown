@@ -7,6 +7,6 @@ categories: jekyll update
 
 At the end of my first module at Turing, Jeff challenged me to complete a difficult coding challenge - building the SHA-1 digest algorithm from scratch using Ruby. I agreed, and proceeded to look up the [SHA-1 specification](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf) from the National Institute of Standards and Technology. The secure hashing standard looks a lot like other engineering specifications I'm used to from previous jobs so the structure of the document was fairly familiar. However, a lot of the concepts were new to me.
 
-I started with the preprocessing section and immediately got stuck when I encountered the line
+I started with the preprocessing section and immediately got stuck when I encountered the line:
 
-$$a^2 + b^2 = c^2$$
+$$ a^2 + b^2 = c^2 $$

@@ -24,6 +24,15 @@ $grey-color:       #009acd;
 $grey-color-light: lighten($grey-color, 40%);
 $grey-color-dark:  darken($grey-color, 25%);
 
+// Main Colors
+$blue-color: #01b0f0;
+$blue-color-light: lighten($blue-color, 40%);
+$blue-color-dark:  darken($blue-color, 25%);
+
+$green-color: #aeee00;
+$green-color-light: lighten($green-color, 30%);
+$green-color-dark:  darken($green-color, 25%);
+
 // Width of the content area
 $content-width:    800px;
 

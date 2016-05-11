@@ -9,7 +9,7 @@ I recently got an assignment at work to move the location of some of the mailing
 
 However, that left me with a question of how to test all of this. I wanted to go beyond just making sure that some piece of mail was 'delivered' in my tests. I figured there must be a way to check at least the subject and maybe a few other parameters.
 
-Turns out this is pretty easy with RSpec. First, in order to make sure your tests don't ACTUALLY send emails, you need to add a line to your test.rb file:
+Turns out this is pretty easy with RSpec. First, in order to make sure your tests don't ACTUALLY send emails, you need to add a line to your `test.rb` file:
 
 ```
 config.action_mailer.delivery_method = :test

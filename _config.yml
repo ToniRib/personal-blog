@@ -16,5 +16,4 @@ twitter_username: tonimarierib
 github_username:  tonirib
 
 # Build settings
-markdown: redcarpet
 extensions: [fenced_code_blocks]

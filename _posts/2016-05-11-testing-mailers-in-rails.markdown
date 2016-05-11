@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Testing Mailers in Rails"
-date:   2016-05-10 19:30:00 -0700
+date:   2016-05-11 19:30:00 -0700
 categories: jekyll update
 ---
 

@@ -6,9 +6,469 @@
 </description>
     <link>http://tonirib.github.io/personal-blog/</link>
     <atom:link href="http://tonirib.github.io/personal-blog/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 25 Nov 2015 13:52:47 -0700</pubDate>
-    <lastBuildDate>Wed, 25 Nov 2015 13:52:47 -0700</lastBuildDate>
-    <generator>Jekyll v2.4.0</generator>
+    <pubDate>Tue, 10 May 2016 19:45:07 -0600</pubDate>
+    <lastBuildDate>Tue, 10 May 2016 19:45:07 -0600</lastBuildDate>
+    <generator>Jekyll v3.0.5</generator>
+    
+      <item>
+        <title>Testing Mailers in Rails</title>
+        <description>&lt;p&gt;I recently got an assignment at work to move the location of some of the mailings we send out so we could also create Event logs to go with each piece of mail. In doing this, I ended out creating a whole new EventMailer class that inherits from ActionMailer::Base. This is called from one of my model classes in the format of &lt;code class=&quot;highlighter-rouge&quot;&gt;event.send_mail&lt;/code&gt; where &lt;code class=&quot;highlighter-rouge&quot;&gt;send_mail&lt;/code&gt; determines what type of mail to send and calls the appropriate Mailer action for it.&lt;/p&gt;
+
+&lt;p&gt;However, that left me with a question of how to test all of this. I wanted to go beyond just making sure that some piece of mail was ‘delivered’ in my tests. I figured there must be a way to check at least the subject and maybe a few other parameters.&lt;/p&gt;
+
+&lt;p&gt;Turns out this is pretty easy with RSpec. First, in order to make sure your tests don’t ACTUALLY send emails, you need to add a line to your &lt;code class=&quot;highlighter-rouge&quot;&gt;test.rb&lt;/code&gt; file:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+config.action_mailer.delivery_method = :test
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;This ensures that new messages will simply populate the &lt;code class=&quot;highlighter-rouge&quot;&gt;ActionMailer::Base.deliveries&lt;/code&gt; array instead of flooding your users with junk test mail. Then, you can simply write a test like this:&lt;/p&gt;
+
+&lt;p&gt;```
+it “sends mail to the correct user” do
+  event = Event.new(name: “New Mail”)&lt;/p&gt;
+
+&lt;p&gt;expect { event.send_mail }
+    .to change { ActionMailer::Base.deliveries.count }.by(1)&lt;/p&gt;
+
+&lt;p&gt;mail = ActionMailer::Base.deliveries.last
+  expect(mail.subject).to eq event.name
+  expect(mail.from).to include “example@example.com”
+end
+```&lt;/p&gt;
+
+&lt;p&gt;You can use the block expect syntax from RSpec to show that the number of ‘deliveries’ has increased by one. Then, because the actual ‘mail’ is stored in the &lt;code class=&quot;highlighter-rouge&quot;&gt;ActionMailer::Base.deliveries&lt;/code&gt; array, we can pick out the first one and check it’s subject and who sent it.&lt;/p&gt;
+
+&lt;p&gt;However, this wasn’t enough for me. I currently have two main methods in my Mailer class and I wanted to make sure the correct type of email was being sent. This one took a little more searching, but it is possible to test. In the example below, &lt;code class=&quot;highlighter-rouge&quot;&gt;event.send_mail&lt;/code&gt; uses the name of the event to determine which of the two EventMailer methods to call. In this case, I am expecting it to call &lt;code class=&quot;highlighter-rouge&quot;&gt;EventMailer.first_mailer_method(name).deliver_now&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;```
+it “sends mail through the appropriate method” do
+   event = Event.new(name: “First Mailer Method”)&lt;/p&gt;
+
+&lt;p&gt;message_delivery = instance_double(ActionMailer::MessageDelivery)
+   expect(EventMailer).to receive(:first_mailer_method).with(event.name).and_return(message_delivery)
+   expect(message_delivery).to receive(:deliver_now)&lt;/p&gt;
+
+&lt;p&gt;event.send_mail
+ end
+```&lt;/p&gt;
+
+&lt;p&gt;This creates an &lt;a href=&quot;https://relishapp.com/rspec/rspec-mocks/v/3-2/docs/verifying-doubles/using-an-instance-double&quot;&gt;instance double&lt;/a&gt; of the &lt;a href=&quot;http://edgeapi.rubyonrails.org/classes/ActionMailer/MessageDelivery.html&quot;&gt;ActionMailer::MessageDelivery&lt;/a&gt; class which is used by &lt;code class=&quot;highlighter-rouge&quot;&gt;ActionMailer::Base&lt;/code&gt; when creating a new mailer. We can then say that we expect our &lt;code class=&quot;highlighter-rouge&quot;&gt;EventMailer&lt;/code&gt; to receive a call to the &lt;code class=&quot;highlighter-rouge&quot;&gt;first_mailer_method&lt;/code&gt; with the appropriate arguments and that it turns an instance of our &lt;code class=&quot;highlighter-rouge&quot;&gt;message_delivery&lt;/code&gt; instance double. Since &lt;code class=&quot;highlighter-rouge&quot;&gt;deliver_now&lt;/code&gt; is also chained on the end, we have to add the additional statement that &lt;code class=&quot;highlighter-rouge&quot;&gt;message_delivery&lt;/code&gt; should receive &lt;code class=&quot;highlighter-rouge&quot;&gt;deliver_now&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;It’s always been a little strange to me that I have to make the actual call after the expectations, but in RSpec I’m basically setting it up to say “hey, you’re about to receive something like this, and here’s what I’m expecting to happen once you do.” I wasn’t convinced at first that this was passing for the correct reasons, so I tried subbing out the &lt;code class=&quot;highlighter-rouge&quot;&gt;first_mailer_method&lt;/code&gt; with my &lt;code class=&quot;highlighter-rouge&quot;&gt;second_mailer_method&lt;/code&gt; just to ensure that it would fail since that method is not expected to be called in this instance. Happily, it failed!&lt;/p&gt;
+
+&lt;p&gt;I’m sure there are even more ways to test Mailers, but this was a good start for me.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 10 May 2016 13:30:00 -0600</pubDate>
+        <link>http://tonirib.github.io/personal-blog/jekyll/update/2016/05/10/testing-mailers-in-rails.html</link>
+        <guid isPermaLink="true">http://tonirib.github.io/personal-blog/jekyll/update/2016/05/10/testing-mailers-in-rails.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>Learning Vim</title>
+        <description>&lt;p&gt;A few weeks ago, I decided to tackle the daunting challenge of learning &lt;a href=&quot;http://www.vim.org/&quot;&gt;Vim&lt;/a&gt;. As a new developer, learning Atom was fast and easy, but Vim is an entire paradigm shift. The idea of using letters instead of arrow keys to move around a document and mastering the different “modes” each present their own challenges.&lt;/p&gt;
+
+&lt;p&gt;So how did I go about it? I first stumbled across the site &lt;a href=&quot;http://upcase.com&quot;&gt;Upcase&lt;/a&gt; by &lt;a href=&quot;https://thoughtbot.com/&quot;&gt;thoughtbot&lt;/a&gt; and gave in to spending the $29.99 per month for the service. While the price may seem steep for someone with no income right now, I figure anything that helps make me into a better developer is worth the extra cost. They have video series along with extremely detailed lecture notes for learning Vim (among other things). One of the first things they suggest doing is typing &lt;code class=&quot;highlighter-rouge&quot;&gt;vimtutor&lt;/code&gt; into your terminal and following along with the instructions. This was helpful to learn the basic commands, but I realized right away that what I actually needed was practice…&lt;strong&gt;lots&lt;/strong&gt; of practice.&lt;/p&gt;
+
+&lt;p&gt;I made the commitment to work on at least one project or lesson per day in Vim. It was extremely frustrating (and slow) at first, but as I watched more of the Upcase videos and committed to even more practice, it started getting easier and easier. I also make it a point to Google shortcut commands I’ve forgotten (such as, ‘how do I jump to the end of the line in Vim?’) so I can get practice using them instead of taking the ‘long way around.’&lt;/p&gt;
+
+&lt;p&gt;The other thing that really helped was installing &lt;a href=&quot;https://github.com/VundleVim/Vundle.vim&quot;&gt;Vundle&lt;/a&gt; which is a Vim plugin manager. It’s pretty easy to use and it allows you to install cool plugins like &lt;a href=&quot;https://github.com/kien/ctrlp.vim&quot;&gt;CtrlP&lt;/a&gt; which finally allowed me to have a fuzzy file finder similar to Atom’s Ctrl-p. This was a total game changer for me since I could finally switch between files quickly and easily. Mastering tabs in Vim is another must-have if you’re going to switch to it full time, along with setting up custom key bindings to help access frequently used commands quickly.&lt;/p&gt;
+
+&lt;p&gt;Vim still seems slow to me but I know that eventually it will all be muscle-memory and I will be lightning fast (or so the guys at thoughtbot promise me)! The next challenge will be mastering tmux so I can setup a workflow run completely from my terminal.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 16 Feb 2016 15:30:00 -0700</pubDate>
+        <link>http://tonirib.github.io/personal-blog/jekyll/update/2016/02/16/learning-vim.html</link>
+        <guid isPermaLink="true">http://tonirib.github.io/personal-blog/jekyll/update/2016/02/16/learning-vim.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>Creating a Rails Template</title>
+        <description>&lt;p&gt;Every time I start a new Rails app I seem to forget at least one gem or configuration setting. I’m sure you’ve been there before too. Whether it’s setting the database up to use postgresql, remembering to add (and configure) database cleaner, or remembering to add capybara for easier testing, I always seem to forget something.&lt;/p&gt;
+
+&lt;p&gt;I was pairing with a friend on Saturday who was showing me how to properly set up javascript testing using RSpec and was thinking to myself “man, there’s so much setup here I’m DEFINITELY going to forget something next time I do this!”&lt;/p&gt;
+
+&lt;p&gt;And then today I stumbled upon &lt;a href=&quot;http://guides.rubyonrails.org/rails_application_templates.html&quot;&gt;Rails Application Templates&lt;/a&gt; and &lt;a href=&quot;https://www.natashatherobot.com/how-to-configure-your-rails-defaults/&quot;&gt;this blog on the .railsrc file&lt;/a&gt; and immediately spent 2 hours setting up files of my own.&lt;/p&gt;
+
+&lt;h2 id=&quot;railsrc&quot;&gt;.railsrc&lt;/h2&gt;
+
+&lt;p&gt;So what are these magical files? The &lt;code class=&quot;highlighter-rouge&quot;&gt;.railsrc&lt;/code&gt; is similar to your &lt;code class=&quot;highlighter-rouge&quot;&gt;.bash_profile&lt;/code&gt; except it is executed every time you run the &lt;code class=&quot;highlighter-rouge&quot;&gt;rails new&lt;/code&gt; command. It’s basically a file of the default settings you want Rails to use whenever creating a new Rails project. So if you’re like me and you forget to add &lt;code class=&quot;highlighter-rouge&quot;&gt;-d postgresql&lt;/code&gt; even though you &lt;strong&gt;always&lt;/strong&gt; want a postgres database, fear not! Simply add this line to your &lt;code class=&quot;highlighter-rouge&quot;&gt;.railsrc&lt;/code&gt; file and you’ll never forget again.&lt;/p&gt;
+
+&lt;p&gt;Here’s how my final &lt;code class=&quot;highlighter-rouge&quot;&gt;.railsrc&lt;/code&gt; file turned out:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+--skip-bundle
+--skip-test-unit
+--database=postgresql
+--skip-turbolinks
+--template=~/template.rb
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Now let’s go through each one and explain why I used it:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+--skip-bundle
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;This tells the rails generator to skip bundling my gems, which I want to do because I’m going to completely replace the gemfile in my template.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+--skip-test-unit
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Necessary since I am going to immediately set up my testing using &lt;a href=&quot;https://github.com/rspec/rspec-rails&quot;&gt;RSpec&lt;/a&gt;. Might as well skip the regular Test::Unit if I know I am going to not use it and will remove the entire test directory anyway.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+--database=postgresql
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;So I never forget to use postgresql instead of sqlite3! This helps especially if you are going to push your app to Heroku for production.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+--skip-turbolinks
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Turbolinks have caused me pain in the past. They seem to interfere with javascript/jQuery sometimes so I ended out having to remove them entirely from my last project. I’ve gotten the same feedback from other Turing students so I’m just going to opt out.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+--template=~/template.rb
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;This tells Rails where to find my Rails Application Template file that I want to use for all Rails projects going forward. In this file is where most of the magic happens, so let’s take a look at it!&lt;/p&gt;
+
+&lt;h2 id=&quot;rails-application-template&quot;&gt;Rails Application Template&lt;/h2&gt;
+
+&lt;p&gt;Before going into details about my template file, here’s a link to it: &lt;a href=&quot;https://gist.github.com/ToniRib/c9ae717689d84febc8a3&quot;&gt;Toni’s Rails Template&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;I modeled my Rails template after some recent projects, but obviously you can customize yours to your liking. One of the great things you can do in the template is add all of the gems that you are going to want so you don’t forget any. I found that if I didn’t delete the Gemfile and then re-create it, Rails would group my gems together all funky. Here’s a look at how I’m creating the Gemfile:&lt;/p&gt;
+
+&lt;p&gt;```
+# template.rb&lt;/p&gt;
+
+&lt;h1 id=&quot;remove-the-gemfile-so-we-can-start-with-a-clean-slate-otherwise-rails-groups&quot;&gt;Remove the gemfile so we can start with a clean slate otherwise Rails groups&lt;/h1&gt;
+&lt;p&gt;# the gems in a very strange way
+remove_file “Gemfile”
+add_file “Gemfile”&lt;/p&gt;
+
+&lt;p&gt;prepend_to_file “Gemfile” do
+  “source &quot;https://rubygems.org&quot;”
+end&lt;/p&gt;
+
+&lt;h1 id=&quot;add-all-the-regular-gems&quot;&gt;Add all the regular gems&lt;/h1&gt;
+&lt;p&gt;gem “rails”, “4.2.5.1”
+gem “bootstrap-sass”, “~&amp;gt; 3.3.6”
+gem “sass-rails”, “~&amp;gt; 5.0”
+gem “uglifier”, “&amp;gt;= 1.3.0”
+gem “jquery-rails”
+gem “jbuilder”, “~&amp;gt; 2.0”
+gem “sdoc”, “~&amp;gt; 0.4.0”, group: :doc
+gem “bcrypt”, “~&amp;gt; 3.1.7”
+gem “figaro”
+gem “pg”&lt;/p&gt;
+
+&lt;p&gt;gem_group :development, :test do
+  gem “byebug”
+  gem “rspec-rails”, “~&amp;gt; 3.0”
+  gem “capybara”
+  gem “database_cleaner”
+  gem “selenium-webdriver”
+  gem “factory_girl_rails”, “~&amp;gt; 4.0”
+  gem “shoulda-matchers”, “~&amp;gt; 3.1”
+end&lt;/p&gt;
+
+&lt;p&gt;gem_group :development do
+  gem “web-console”, “~&amp;gt; 2.0”
+  gem “spring”
+  gem “quiet_assets”
+end
+```&lt;/p&gt;
+
+&lt;p&gt;You might wonder where all the commands like &lt;code class=&quot;highlighter-rouge&quot;&gt;gem_group&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;prepend_to_file&lt;/code&gt; came from. Turns out these are &lt;a href=&quot;http://www.rubydoc.info/github/wycats/thor/Thor/Actions&quot;&gt;Thor Actions&lt;/a&gt; that you can use to really easily do almost anything to your files when setting them up. This documentation is extremely useful if you’re going to do anything more complicated in your template file than just adding gems. If found some of the most useful commands were &lt;code class=&quot;highlighter-rouge&quot;&gt;prepend_to_file&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;append_to_file&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;insert_into_file&lt;/code&gt; because it allowed me to not only create new files and folders but also to modify existing files to create the exact configuration I wanted.&lt;/p&gt;
+
+&lt;p&gt;After getting my Gemfile set up I bundled and ran some of the RSpec setup:&lt;/p&gt;
+
+&lt;p&gt;```
+# Bundle and set up RSpec
+run “bundle install”
+run “rails generate rspec:install”&lt;/p&gt;
+
+&lt;h1 id=&quot;set-up-the-spec-folders-for-rspec&quot;&gt;Set up the spec folders for RSpec&lt;/h1&gt;
+&lt;p&gt;run “mkdir spec/models”
+run “mkdir spec/controllers”
+run “mkdir spec/features”
+run “touch spec/factories.rb”
+```&lt;/p&gt;
+
+&lt;p&gt;I also wanted to set up &lt;a href=&quot;https://github.com/thoughtbot/factory_girl_rails&quot;&gt;FactoryGirl&lt;/a&gt; with a &lt;code class=&quot;highlighter-rouge&quot;&gt;factories.rb&lt;/code&gt; file and ensure the FactoryGirl configuration made it into the &lt;code class=&quot;highlighter-rouge&quot;&gt;rails_helper.rb&lt;/code&gt; file:&lt;/p&gt;
+
+&lt;p&gt;```
+# Inject into the factory girl files
+append_to_file “spec/factories.rb” do
+  “FactoryGirl.define do\nend”
+end&lt;/p&gt;
+
+&lt;p&gt;insert_into_file “spec/rails_helper.rb”, after: “RSpec.configure do |config|\n” do
+  “  config.include FactoryGirl::Syntax::Methods\n”
+end
+```&lt;/p&gt;
+
+&lt;p&gt;Similarly, I needed to set up the configuration for &lt;a href=&quot;https://github.com/DatabaseCleaner/database_cleaner&quot;&gt;DatabaseCleaner&lt;/a&gt; in the &lt;code class=&quot;highlighter-rouge&quot;&gt;rails_helper.rb&lt;/code&gt; file so I won’t have any funky test errors due to my database not being cleaned out after each test:&lt;/p&gt;
+
+&lt;p&gt;```
+# Set up Database Cleaner
+insert_into_file “spec/rails_helper.rb”, after: “RSpec.configure do |config|\n” do
+  “  config.before(:suite) do\n    DatabaseCleaner.clean_with(:truncation)\n  end\n\n
+  config.before(:each) do\n    DatabaseCleaner.strategy = :transaction\n  end\n\n
+  config.before(:each, :js =&amp;gt; true) do\n    DatabaseCleaner.strategy = :truncation\n  end\n\n
+  config.before(:each) do\n    DatabaseCleaner.start\n  end\n\n
+  config.after(:each) do\n    DatabaseCleaner.clean\n  end\n\n”
+end&lt;/p&gt;
+
+&lt;p&gt;gsub_file “spec/rails_helper.rb”,
+          “config.use_transactional_fixtures = true”,
+          “config.use_transactional_fixtures = false”
+```&lt;/p&gt;
+
+&lt;p&gt;Some of the spacing looks a little odd but it’s so everything is indented properly in the file when it is created. Additionally, &lt;a href=&quot;http://devblog.avdi.org/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/&quot;&gt;this blog&lt;/a&gt; was very helpful for understanding this configuration.&lt;/p&gt;
+
+&lt;p&gt;Next I got &lt;a href=&quot;https://github.com/thoughtbot/shoulda-matchers&quot;&gt;ShouldaMatchers&lt;/a&gt; set up per thoughtbot’s suggested configuration for use with RSpec:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+# Set up Shoulda Matchers
+append_to_file &quot;spec/rails_helper.rb&quot; do
+  &quot;\nShoulda::Matchers.configure do |config|\n  config.integrate do |with|\n    with.test_framework :rspec\n    with.library :rails\n  end\nend&quot;
+end
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;I also want to use &lt;a href=&quot;https://github.com/twbs/bootstrap-sass&quot;&gt;bootstrap-sass&lt;/a&gt; in my projects which required a little more configuration. First I had to rename &lt;code class=&quot;highlighter-rouge&quot;&gt;application.css&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;application.scss&lt;/code&gt;. I always like to have a &lt;code class=&quot;highlighter-rouge&quot;&gt;custom.scss&lt;/code&gt; file in my project so I created that also. I then imported the bootstrap gems into the &lt;code class=&quot;highlighter-rouge&quot;&gt;application.scss&lt;/code&gt; file and removed (per the gem’s instructions) the &lt;code class=&quot;highlighter-rouge&quot;&gt;*= require_tree .&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;*= require_self&lt;/code&gt; lines since it is recommend to simply use the Sass &lt;code class=&quot;highlighter-rouge&quot;&gt;@import&lt;/code&gt; function to add in all necessary files. Finally, I added the bootstrap sprockets into the &lt;code class=&quot;highlighter-rouge&quot;&gt;application.js&lt;/code&gt; file to get access to bootstrap’s javascript features.&lt;/p&gt;
+
+&lt;p&gt;```
+# Set up for scss and bootstrap
+run “mv app/assets/stylesheets/application.css app/assets/stylesheets/application.scss”
+run “touch app/assets/stylesheets/custom.scss”&lt;/p&gt;
+
+&lt;p&gt;append_to_file “app/assets/stylesheets/application.scss” do
+  “\n\n@import &quot;bootstrap-sprockets&quot;;\n@import &quot;bootstrap&quot;;\n@import &quot;custom&quot;;”
+end&lt;/p&gt;
+
+&lt;p&gt;gsub_file “app/assets/stylesheets/application.scss”,
+          “*= require_tree .”,
+          “”&lt;/p&gt;
+
+&lt;p&gt;gsub_file “app/assets/stylesheets/application.scss”,
+          “*= require_self”,
+          “”&lt;/p&gt;
+
+&lt;p&gt;append_to_file “app/assets/javascripts/application.js” do
+  “//= require bootstrap-sprockets”
+end
+```&lt;/p&gt;
+
+&lt;p&gt;One thing that really bugs me about new Rails apps is that they don’t include the line for ensuring your website is responsive (and properly resized) on mobile devices. Since I ALWAYS forget this one, it definitely had to go into my template.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+insert_into_file &quot;app/views/layouts/application.html.erb&quot;, before: &quot;&amp;lt;/head&amp;gt;&quot; do
+  &quot;  &amp;lt;meta name=\&quot;viewport\&quot; content=\&quot;width=device-width, initial-scale=1\&quot;&amp;gt;&quot;
+end
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Finally, I renamed the README file, initialized a new git repository and made the first commit:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+# et up as a git repo and make the first commit
+after_bundle do
+  git :init
+  git add: &#39;.&#39;
+  git commit: &quot;-a -m &#39;Initial commit&#39;&quot;
+end
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;And that’s it!&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;I wanted to make sure this actually worked, so I set up a &lt;a href=&quot;https://github.com/ToniRib/example_with_template&quot;&gt;test repo&lt;/a&gt; and created some basic tests to ensure all of my gems and configurations were working as expected. Everything seems to be working great, and I can guarantee you that even though I had to spend some time setting all of this up, it’s going to be totally worth it.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 15 Feb 2016 16:00:00 -0700</pubDate>
+        <link>http://tonirib.github.io/personal-blog/jekyll/update/2016/02/15/rails-application-template.html</link>
+        <guid isPermaLink="true">http://tonirib.github.io/personal-blog/jekyll/update/2016/02/15/rails-application-template.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>Building the SHA-1 Digest Algorithm in Object-Oriented Ruby</title>
+        <description>&lt;p&gt;At the end of my first module at Turing, Jeff challenged me to complete a difficult coding challenge - building the SHA-1 digest algorithm from scratch using Ruby. I agreed, and proceeded to look up the &lt;a href=&quot;http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf&quot;&gt;SHA-1 specification&lt;/a&gt; from the National Institute of Standards and Technology. The secure hashing standard looks a lot like other engineering specifications I’m used to from previous jobs so the structure of the document was fairly familiar. However, a lot of the concepts were new to me.&lt;/p&gt;
+
+&lt;p&gt;I started with the preprocessing section and immediately got stuck when I encountered the line:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;l + 1 + k \equiv 448mod512&lt;/script&gt;
+
+&lt;p&gt;What on earth does that mean? Throughout this project I ended up on Google and Stack Overflow researching a lot of the concepts, including this one.&lt;/p&gt;
+
+&lt;p&gt;In this example, \(l\) is the length of the original message \(M\) in bits and \(k\)is the number of zero bits that are going to pad the message. That seems simple enough, so I originally tried to solve for \(k\). However, that approach becomes convoluted very quickly, and is difficult to solve for when the original message is longer than 447 bits. With some more searching, I realized that what you actually need to do is determine the minimum number of 512 bit words that can contain the entire message, plus the number one, plus the length encoded as a 64 bit binary message.&lt;/p&gt;
+
+&lt;p&gt;This made the problem much easier to solve, because instead of figuring out how many zero bits of padding you need, you can simply figure out how many blocks you will need, add the message plus the number one to the beginning, append on zeros until you hit a multiple of 512 bits, and then remove the last 64 zeros and replace them with the length encoded as a 64 bit binary message. Finally, you can cut the entire message into blocks of 512 bits, since each block will be treated separately when processing.&lt;/p&gt;
+
+&lt;p&gt;With that problem solved, I moved onto the processing section. This section involves a lot more steps, so I broke the problem down into each individual step and wrote at least one method per step. Each step is performed on one 512-bit block at a time, which is also divided into sixteen 32 bit words.&lt;/p&gt;
+
+&lt;p&gt;First you create the message schedule by following a specific formula to turn the sixteen 32 bit words into eighty 32 bit words. The first 16 words are just the original 16 words of the message, but past that the new words rely on combinations of previous message schedule words. This is the first section where I had to start looking up computer science concepts such as how to perform a binary left shift and a bitwise exclusive or on four different binary strings. I realized that these operations were going to be used more than once while processing so I create separate methods for them.&lt;/p&gt;
+
+&lt;p&gt;Ruby actually comes with some built in operators for performing methods like ‘xor’ and ‘and’, but they operate on integers, so I found myself often switching between integers and binary strings. I also had to implement methods to convert from hex to binary or binary to hex since the SHA-1 constants are given in hexadecimal.&lt;/p&gt;
+
+&lt;p&gt;After generating the message schedule, you set up the 5 working variables, which change each time you go through the loop (which is 80 times, one for each word). Updating the working variables is where the SHA-1 function is finally used. This function is actually four functions, each of which has its own constant, and each of which is used at a different point in the loop. You then construct the intermediate hash by adding the new working variable values to the previous hash value (which is originally initialized as a constant). Finally, after going through all of the words, and each of the 512-bit blocks (if there were more than one), you concatenate together the five 32-bit hash values to achieve the final message digest. The final message is then converted to hexadecimal and displayed to the user.&lt;/p&gt;
+
+&lt;p&gt;The problem that I ran into at the end is that until I have done all of the preprocessing and processing, I wouldn’t know until the very end whether or not I had the right answer. Since the SHA-1 hash should be the same every time for the same input string, I could use the Digest::SHA1 class that Ruby comes with to compare my answer with the real answer. As it turns out, I didn’t have the correct answer the first time. I actually had two separate bugs that I had to track down.&lt;/p&gt;
+
+&lt;p&gt;The first one was hidden in an incorrect copying of one of the constants. I started by rechecking my methods (which I had tests for, but it never hurts to write more tests) and realizing that all of my methods seemed to be performing properly. I wanted to know if I had a copy/paste error, so I rechecked all the hex constants I had copied. Sure enough, in one constant I had typed an ‘a’ instead of a ‘c.’ However, fixing that didn’t make my hexdigest match what Ruby was spitting out, so I knew I had another bug somewhere.&lt;/p&gt;
+
+&lt;p&gt;I wanted to be able to check the intermediate steps to my program, basically what the working variables should be equal to after each step. All my tests were passing, so I suspected that it wasn’t a problem with any of my methods, but in an input I was passing to my methods. Basically I had tested that with the correct inputs, I always got the correct outputs, so if I was still getting the wrong output, I must be putting in the wrong input somewhere. I ended out using pry and &lt;a href=&quot;http://www.metamorphosite.com/one-way-hash-encryption-sha1-data-software&quot;&gt;this site&lt;/a&gt; which shows you, for a given message, what every single intermediate binary string is to help me debug. I quickly tracked the problem to my methods where I generate the temporary working variable anytime after the first iteration. From there, it was easy to see that in my ‘process’ method I had accidentally passed in a constant instead of the number for the current iteration I was on, causing the answer to be incorrect anytime after the zeroth iteration. With that fixed, everything worked!&lt;/p&gt;
+
+&lt;p&gt;The main takeaway that I learned from building this algorithm is that it helps to break each individual process and step apart into as small of chunks as possible and only take the current thing you’re working on. Taken as a whole, the specification looks intimidating, but by using TDD and going slowly through each part, the entire thing came together easier than I thought it would.&lt;/p&gt;
+
+&lt;p&gt;Since I’m using fish as my shell, I also added a fish function for my SHA-1 digest so that I can use it anywhere in my terminal.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+function sha1_digest
+  ruby ~/turing/personal-projects/sha1/lib/sha1_hexdigest.rb $argv
+end
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Now from any directory, I can type the command ‘sha1_digest’ and get back the corresponding hexdigest for any message.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+$ sha1_digest &#39;toni&#39;
+Your SHA-1 Hex Digest for the message &#39;toni&#39; is:
+532ff71c0f0c138e61afd0c77279be9f5bb6c4f0
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;My final GitHub repo is here: &lt;a href=&quot;https://github.com/ToniRib/SHA-1&quot;&gt;https://github.com/ToniRib/SHA-1&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Mon, 04 Jan 2016 11:19:00 -0700</pubDate>
+        <link>http://tonirib.github.io/personal-blog/jekyll/update/2016/01/04/sha1.html</link>
+        <guid isPermaLink="true">http://tonirib.github.io/personal-blog/jekyll/update/2016/01/04/sha1.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>Switching to Fish</title>
+        <description>&lt;p&gt;I’ve been wondering for a while how some of the instructors get the cool autocomplete suggestions in their terminal window but have been completely unable to figure it out. I finally learned that it isn’t something you can do with bash, but that there’s a totally different shell called fish that has this functionality built in! I made the decision to switch over break thinking that it would be as easy as switching from Terminal to iTerm 2.&lt;/p&gt;
+
+&lt;p&gt;Turns out that wasn’t quite the case.&lt;/p&gt;
+
+&lt;p&gt;I learned that fish, while similar to bash, has quite a few differences, especially in how the configuration is done. I was hoping to be able to just copy my bash_profile into a new file, but fish works in an entirely different way. Instead of aliasing common commands, I had to create separate .fish function files and create a function for each of my previous aliases.&lt;/p&gt;
+
+&lt;p&gt;For example, my old alias used to look like:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+alias gpom=&quot;git push origin master&quot;
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;But in fish I now have a file located at &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.config/fish/functions/gpom.fish&lt;/code&gt; which contains:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+function gpom
+  git push origin master
+end
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;I also ran into trouble with the prompt. I had a pretty customized prompt with the ‘dirty’ git status being a main feature of it. It took quite a bit of Googling, but there are people out there who have solved this problem. I ended out using &lt;a href=&quot;https://github.com/mariuszs/informative_git_prompt/blob/master/__informative_git_prompt.fish&quot;&gt;a solution from Mariusz Smykula&lt;/a&gt; with a few tweaks of my own.&lt;/p&gt;
+
+&lt;p&gt;The prompt itself it also strange because it is located in another fish function file called &lt;code class=&quot;highlighter-rouge&quot;&gt;fish_prompt.fish&lt;/code&gt;. There is no ‘PS1’ like you would find in bash, just another function called fish_prompt. I ended out setting mine up like this:&lt;/p&gt;
+
+&lt;p&gt;```
+function fish_prompt –description ‘Write out the prompt’&lt;/p&gt;
+
+&lt;p&gt;set -l last_status $status&lt;/p&gt;
+
+&lt;p&gt;set_color 55f914
+  echo -n (basename $PWD)
+  set_color normal&lt;/p&gt;
+
+&lt;p&gt;echo -n ‘ ‘
+  __informative_git_prompt&lt;/p&gt;
+
+&lt;p&gt;if not test $last_status -eq 0
+    set_color $fish_color_error
+  end&lt;/p&gt;
+
+&lt;p&gt;set_color yellow
+  echo -n ‘ ➾ ‘&lt;/p&gt;
+
+&lt;p&gt;set_color normal
+end
+```&lt;/p&gt;
+
+&lt;p&gt;Now that I have everything set up similar to bash, I’m digging all of the autocomplete and search features I have with fish. It took a while to get it all up and running, but I think it might be worth it!&lt;/p&gt;
+</description>
+        <pubDate>Tue, 29 Dec 2015 19:42:00 -0700</pubDate>
+        <link>http://tonirib.github.io/personal-blog/jekyll/update/2015/12/29/fish.html</link>
+        <guid isPermaLink="true">http://tonirib.github.io/personal-blog/jekyll/update/2015/12/29/fish.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>Behind The Scenes</title>
+        <description>&lt;p&gt;We’ve been working with Sinatra the last two weeks and now that we’ve done some reading on Rails I understand why we took the approach we did. There has been some frustration among the class as to why we would spend so much time learning Sinatra if we may not use it again, but I think if we had jumped directly into Rails we wouldn’t have much understand of what is going on behind the scenes with our routes.&lt;/p&gt;
+
+&lt;p&gt;It reminds me a little of high school math class. At my school, we were always taught the most difficult and long way of solving a problem first, especially in Calculus. Our teacher really wanted us to understand WHY we were doing something and what was happening at every step. After we mastered that, we would be taught the short and easy way of solving the problem. It was always far more practical, but if we had started with that we might not understand what was really happening. Finally, we would be taught how to do it with our calculators, which would basically just spit out the right answer without any knowledge of how it go it. Obviously this was the fastest and easiest way to get to the answer (and what you might do at a real job) but by this time we already had a solid understanding of what was happening.&lt;/p&gt;
+
+&lt;p&gt;It’s been a long time since I was taught this way and I truly appreciate it. I’m happy to have enrolled in a program where they don’t just drop us into Rails immediately. It may teach me how to build an app in Rails, but I would probably have no idea how to translate that knowledge into any other framework.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 14 Dec 2015 09:52:00 -0700</pubDate>
+        <link>http://tonirib.github.io/personal-blog/jekyll/update/2015/12/14/mod-2-week-2.html</link>
+        <guid isPermaLink="true">http://tonirib.github.io/personal-blog/jekyll/update/2015/12/14/mod-2-week-2.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>Follow the Errors</title>
+        <description>&lt;p&gt;This week in module 2 we spent a lot of time creating errors in our code (on purpose) and then “following the errors” to fix them. We learned this technique in module 1 but I didn’t realize how useful and important it was until trying it on a very large set of complicated errors, some of which I hadn’t seen before. It certainly reinforced the reasons for doing Test Driven Development.&lt;/p&gt;
+
+&lt;p&gt;I spent a lot of time this week with new student from the 1511 cohort, mostly trying to get them to practice good TDD and take each error one step at a time. It was really useful that I was currently doing this in my own project because it helped give me a way to convince them that even though their programs were simple and sometimes you could jump a few errors ahead, it really does pay off to practice going just one error at a time.&lt;/p&gt;
+
+&lt;p&gt;Test Driven Development has been a new concept for me since starting at Turing and it’s the best thing that I’ve learned so far. I often compare how we solve problems by writing the tests first to how my old program at Raytheon approached testing. Basically the program had a separate test team, who neither knew the requirements for the software or (sometimes) also didn’t know how to run the software. The program would wait until all development was “done” to even think about how to test the software. It was never surprising to me how many bugs the software had and how poorly the tests were written and executed. Though it would take a lot for a company like Raytheon to change, I feel like there’s no program too big that wouldn’t benefit from switching over to TDD.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 04 Dec 2015 10:05:00 -0700</pubDate>
+        <link>http://tonirib.github.io/personal-blog/jekyll/update/2015/12/04/mod-2-week-1.html</link>
+        <guid isPermaLink="true">http://tonirib.github.io/personal-blog/jekyll/update/2015/12/04/mod-2-week-1.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
     
       <item>
         <title>Are You Comfortable?</title>

@@ -6,12 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>toni rib</title>
-  <meta name="description" content="Thoughts from the mind of Toni, served up hot for your reading pleasure.
-">
+  <title>Switching to Fish</title>
+  <meta name="description" content="I’ve been wondering for a while how some of the instructors get the cool autocomplete suggestions in their terminal window but have been completely unable to...">
 
   <link rel="stylesheet" href="/personal-blog/css/main.css">
-  <link rel="canonical" href="http://tonirib.github.io/personal-blog/photos.html">
+  <link rel="canonical" href="http://tonirib.github.io/personal-blog/jekyll/update/2015/12/29/fish.html">
   <link rel="alternate" type="application/rss+xml" title="toni rib" href="http://tonirib.github.io/personal-blog/feed.xml">
 
   <link href='https://fonts.googleapis.com/css?family=Josefin+Sans:400,100,700' rel='stylesheet' type='text/css'>
@@ -83,11 +82,64 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <article class="photos">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <p>
-    photos here
-  </p>
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Switching to Fish</h1>
+    <p class="post-meta"><time datetime="2015-12-29T19:42:00-07:00" itemprop="datePublished">Dec 29, 2015</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>I’ve been wondering for a while how some of the instructors get the cool autocomplete suggestions in their terminal window but have been completely unable to figure it out. I finally learned that it isn’t something you can do with bash, but that there’s a totally different shell called fish that has this functionality built in! I made the decision to switch over break thinking that it would be as easy as switching from Terminal to iTerm 2.</p>
+
+<p>Turns out that wasn’t quite the case.</p>
+
+<p>I learned that fish, while similar to bash, has quite a few differences, especially in how the configuration is done. I was hoping to be able to just copy my bash_profile into a new file, but fish works in an entirely different way. Instead of aliasing common commands, I had to create separate .fish function files and create a function for each of my previous aliases.</p>
+
+<p>For example, my old alias used to look like:</p>
+
+<p><code class="highlighter-rouge">
+alias gpom="git push origin master"
+</code></p>
+
+<p>But in fish I now have a file located at <code class="highlighter-rouge">~/.config/fish/functions/gpom.fish</code> which contains:</p>
+
+<p><code class="highlighter-rouge">
+function gpom
+  git push origin master
+end
+</code></p>
+
+<p>I also ran into trouble with the prompt. I had a pretty customized prompt with the ‘dirty’ git status being a main feature of it. It took quite a bit of Googling, but there are people out there who have solved this problem. I ended out using <a href="https://github.com/mariuszs/informative_git_prompt/blob/master/__informative_git_prompt.fish">a solution from Mariusz Smykula</a> with a few tweaks of my own.</p>
+
+<p>The prompt itself it also strange because it is located in another fish function file called <code class="highlighter-rouge">fish_prompt.fish</code>. There is no ‘PS1’ like you would find in bash, just another function called fish_prompt. I ended out setting mine up like this:</p>
+
+<p>```
+function fish_prompt –description ‘Write out the prompt’</p>
+
+<p>set -l last_status $status</p>
+
+<p>set_color 55f914
+  echo -n (basename $PWD)
+  set_color normal</p>
+
+<p>echo -n ‘ ‘
+  __informative_git_prompt</p>
+
+<p>if not test $last_status -eq 0
+    set_color $fish_color_error
+  end</p>
+
+<p>set_color yellow
+  echo -n ‘ ➾ ‘</p>
+
+<p>set_color normal
+end
+```</p>
+
+<p>Now that I have everything set up similar to bash, I’m digging all of the autocomplete and search features I have with fish. It took a while to get it all up and running, but I think it might be worth it!</p>
+
+  </div>
 
 </article>
 

@@ -15,7 +15,7 @@ Here's how I did it.
 
 (Note: Thanks to [Andrew Ray's Blog](http://blog.andrewray.me/how-to-create-custom-iterm2-window-arrangments/) and [Chris Schmitz's Blog](http://chris-schmitz.com/develop-faster-with-iterm-profiles-and-window-arrangements/) for getting me started!)
 
-1) Set up a profile for each pane. To do this, go to `iTerm2 > Preferences > Profiles` and click on the `+` sign on the bottom left side of the window. This will generate a new profile which you can give an appropriate name and any commands you want to be sent at the time of launch.
+1) Set up a profile for each pane. To do this, go to `iTerm2 > Preferences > Profiles` and click on the `+` sign on the bottom left side of the window. This will generate a new profile which you can give an appropriate name and any commands you want to be sent at the time of launch. These can be entered into the `Send text at start` section with a `;` between multiple commands.
 
 2) Ensure that all other iTerm windows that you don't want to be part of this arrangement are closed.
 

@@ -6,12 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>toni rib</title>
-  <meta name="description" content="Thoughts from the mind of Toni, served up hot for your reading pleasure.
-">
+  <title>Setting Up Default iTerm Windows</title>
+  <meta name="description" content="When I first started at Traveler’s Haven, I used to spend 5 minutes every morning getting my window configuration set up. I needed one pane for navigating ou...">
 
   <link rel="stylesheet" href="/personal-blog/css/main.css">
-  <link rel="canonical" href="http://tonirib.github.io/personal-blog/photos.html">
+  <link rel="canonical" href="http://tonirib.github.io/personal-blog/jekyll/update/2016/08/27/setting-up-default-iterm-windows.html">
   <link rel="alternate" type="application/rss+xml" title="toni rib" href="http://tonirib.github.io/personal-blog/feed.xml">
 
   <link href='https://fonts.googleapis.com/css?family=Josefin+Sans:400,100,700' rel='stylesheet' type='text/css'>
@@ -83,11 +82,29 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <article class="photos">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <p>
-    photos here
-  </p>
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Setting Up Default iTerm Windows</h1>
+    <p class="post-meta"><time datetime="2016-08-27T18:15:00-06:00" itemprop="datePublished">Aug 27, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>When I first started at Traveler’s Haven, I used to spend 5 minutes every morning getting my window configuration set up. I needed one pane for navigating our API files and running the console, one for navigating our web files and running that console, one to run redis, one to run sidekiq, one to run memcached, one to run our API server, and one to run our web server. Each morning I would open iTerm, carefully open up 7 tabs the way I wanted them, and then spend time typing the correct commands into each one to get everything up and running that I wanted.</p>
+
+<p>It was a major pain in the ass.</p>
+
+<p>I quickly started Googling to figure out if there was a way around this. Turns out, you can set up window configurations that you can launch with a specific key sequence, which will not only bring up the tabs you want in the correct arrangement, but also launch commands automatically in each one of them! Setting this up took me about 15 minutes, but now when I open iTerm every morning it auto-launches my configuration and everything is ready in about 3 seconds.</p>
+
+<p>Here’s how I did it. The example I’m going to use is for setting up a 3 profile configuration that I’m using to work on a Rails site for my husband’s glass paintings.</p>
+
+<p>(Note: Thanks to <a href="http://blog.andrewray.me/how-to-create-custom-iterm2-window-arrangments/">Andrew Ray’s Blog</a> and <a href="http://chris-schmitz.com/develop-faster-with-iterm-profiles-and-window-arrangements/">Chris Schmitz’s Blog</a> for getting me started!)</p>
+
+<p>1) Set up a profile for each pane. To do this, go to <code class="highlighter-rouge">iTerm2 &gt; Preferences &gt; Profiles</code> and click on the <code class="highlighter-rouge">+</code> sign on the bottom left side of the window. This will generate a new profile which you can give an appropriate name and any commands you want to be sent at the time of launch.</p>
+
+<p><img src="http://tonirib.github.io/images/iterm_profiles.png" alt="iterm_profiles" /></p>
+
+  </div>
 
 </article>
 

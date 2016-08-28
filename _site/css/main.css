@@ -12,7 +12,7 @@ dl, dd, ol, ul, figure {
  */
 body {
   font: 400 16px/1.5 "Josefin Sans", sans-serif;
-  color: #111;
+  color: #00cd00;
   background-color: #fdfdfd;
   -webkit-text-size-adjust: 100%;
   -webkit-font-feature-settings: "kern" 1;
@@ -66,7 +66,7 @@ h1, h2, h3, h4, h5, h6 {
  * Links
  */
 a {
-  color: #00cd00;
+  color: #01b0f0;
   text-decoration: none; }
   a:hover {
     color: #ffd700; }
@@ -140,6 +140,16 @@ pre {
   vertical-align: middle; }
   .icon > svg path {
     fill: #009acd; }
+
+/**
+ * Main Page
+ */
+h1 {
+  color: #111; }
+
+li,
+p {
+  color: #dfff88; }
 
 /**
  * Site header
